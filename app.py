@@ -27,6 +27,7 @@ exclude_cards = 'exclude'
 
 analysis = 'analysis'
 total_decks = 'total-decks'
+inclusion_rate = 'inclusion-rate'
 progress_analysis = 'analysis-progress'
 skeleton = 'skeleton'
 skeleton_type = 'skeleton-type'
@@ -53,7 +54,7 @@ app.layout = dbc.Container([
             ),
             dbc.Button('Fetch decks', id=fetch_decks, class_name='mx-1'),
             dbc.Button('Cancel', id=cancel, color='danger')
-        ]),
+        ], class_name='mb-1'),
         dbc.Col(dbc.Progress(value=0, id=progress_bar), width=12),
         dcc.Store(id=decks_store, data=[])
     ]),
@@ -77,13 +78,15 @@ app.layout = dbc.Container([
         ], width=6),
     ], id=filters),
     dbc.Row(dbc.Col([
+        dbc.Progress(value=0, id=progress_analysis),
         html.H3('Analysis'),
         html.H4([
             'Total decks:',
-            dbc.Badge(0, id=total_decks, class_name='ms-1')
+            dbc.Badge(0, id=total_decks, class_name='mx-1'),
         ]),
-        dbc.Progress(value=0, id=progress_analysis),
-        dcc.Graph(id=placements),
+        dbc.Label('Showing % of available decks'),
+        dbc.Progress(id=inclusion_rate, value=0, color='danger'),
+        dcc.Graph(id=placements, config={'displayModeBar': False}),
         dbc.Button(dcc.Clipboard(id=table_clipboard, content='None'), className='me-1', title='Copy Skeleton Decklist'),
         html.Span(dbc.RadioItems(
             id=skeleton_type,
@@ -165,6 +168,8 @@ def check_decklist(dl, include, exclude):
 
 @callback(
     Output(total_decks, 'children'),
+    Output(inclusion_rate, 'value'),
+    Output(inclusion_rate, 'label'),
     Output(placements, 'figure'),
     Output(skeleton, 'children'),
     Output(table_clipboard, 'content'),
@@ -194,7 +199,7 @@ def update_filter_store(set_progress, decks, include, exclude, skel_type, min_pl
     
     set_progress((45, 'Calculating placements...'))
     placement_data = helpers.placement_analysis(filtered)
-    place_out = _place.create_placement_graph(placement_data)
+    place_out = _place.create_placement_graph(placement_data, len(decks))
 
     set_progress((75, 'Calculating Skeleton...'))
     skeletal_data = helpers.skeletal_analysis(filtered)
@@ -204,7 +209,8 @@ def update_filter_store(set_progress, decks, include, exclude, skel_type, min_pl
 
     skel = [c for c in records if c['skeleton']]
     skeleton_list = '\n'.join((' '.join(str(c[k]) for k in ['count', 'name', 'set', 'number']) for c in skel))
-    return len(filtered), place_out, output, skeleton_list
+    percent_inc = len(filtered)/len(decks)
+    return len(filtered), percent_inc * 100, f'{percent_inc:.1%}', place_out, output, skeleton_list
 
 
 server = app.server

@@ -250,7 +250,7 @@ def skeletal_analysis(decks):
     ] = True
     cutoff_index = cutoff[~cutoff].index[0] if len(cutoff[~cutoff]) > 0 else 0
 
-    df = df.iloc[:cutoff_index + 40, ]
+    df = df.iloc[:cutoff_index + 50, ]
     return df
 
 
