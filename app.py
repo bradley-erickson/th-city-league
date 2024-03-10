@@ -36,6 +36,12 @@ table_clipboard = 'copy-to-clipboard'
 
 app.layout = dbc.Container([
     html.H2('City League Result Analysis'),
+    html.P(
+        'Welcome to the Trainer Hill City League decklist analysis tool. '\
+        'This demo tool caches results from Japanese City Leagues via '\
+        'LimitlessTCG. If an event has not yet been cached on the server, '\
+        'the initial fetching may take a few moments.'
+    ),
     dbc.Row([
         html.H3('Date Range'),
         dbc.Col([

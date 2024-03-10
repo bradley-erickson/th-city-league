@@ -233,6 +233,9 @@ def skeletal_analysis(decks):
         # card_obj['card_type'] = fetch_card_type(max_row['name'])
         df = pd.concat([df, pd.DataFrame([card_obj])], ignore_index=True)
 
+    if len(df.index) == 0:
+        return pd.DataFrame()
+
     max_decks = df['decks'].max()
     df['play_rate'] = df['decks'] / max_decks
 
@@ -240,15 +243,14 @@ def skeletal_analysis(decks):
     df['running_count'] = df['count'].cumsum()
 
     cutoff = (df['running_count'] < 61) & (df['play_rate'] >= 0.5)
+    df['skeleton'] = False
     df.loc[
         cutoff,
         'skeleton'
     ] = True
-    cutoff_index = cutoff[~cutoff].index[0]
+    cutoff_index = cutoff[~cutoff].index[0] if len(cutoff[~cutoff]) > 0 else 0
 
     df = df.iloc[:cutoff_index + 40, ]
-    df['skeleton'] = df['skeleton'].fillna(False)
-
     return df
 
 

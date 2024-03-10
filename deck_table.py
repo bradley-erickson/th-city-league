@@ -15,7 +15,7 @@ def get_card_image(card_code, size):
     card_code = card_code.replace('PR-SV', 'SVP')
     set_code, number = card_code.split('-', 1)
 
-    card_origin = 'tpc' if (set_code.startswith('SV') and set_code[2].isdigit()) or set_code == 'SVHM' else 'tpci'
+    card_origin = 'tpc' if (set_code.startswith('SV') and set_code[2].isdigit()) or set_code in ['SVHM', 'SVHK'] else 'tpci'
     lang = 'EN'
     if card_origin == 'tpc':
         lang = 'JP'
