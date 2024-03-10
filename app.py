@@ -36,7 +36,6 @@ table_clipboard = 'copy-to-clipboard'
 
 app.layout = dbc.Container([
     html.H2('City League Result Analysis'),
-    html.P('How it works:'),
     dbc.Row([
         html.H3('Date Range'),
         dbc.Col([
@@ -46,7 +45,7 @@ app.layout = dbc.Container([
                 end_date=datetime.date.today(),
                 min_date_allowed='2024-01-21'
             ),
-            dbc.Button('Fetch decks', id=fetch_decks),
+            dbc.Button('Fetch decks', id=fetch_decks, class_name='mx-1'),
             dbc.Button('Cancel', id=cancel, color='danger')
         ]),
         dbc.Col(dbc.Progress(value=0, id=progress_bar), width=12),
