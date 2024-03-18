@@ -77,8 +77,6 @@ def fetch_row_info(row):
 def fetch_decklist(url):
     """ fetch a decklist from a given url """
     html = get_html(url)
-    price_html = html.find('span', {'class': 'decklist-price card-price usd'})
-    price = float(price_html.get_text().replace('$', ''))
     soup_cards = html.findAll('div', {'class': 'decklist-card'})
     cards = []
     for soup_card in soup_cards:
@@ -90,7 +88,7 @@ def fetch_decklist(url):
                 'name': soup_card.find('span', {'class': 'card-name'}).get_text()
             }
         )
-    return cards, price
+    return cards
 
 
 def get_tournaments(page=1):
@@ -125,7 +123,7 @@ def get_tour_decklists(url):
     for row in rows:
         placement, decklist_url, name = fetch_row_info(row)
         if decklist_url:
-            decklist, price = fetch_decklist(decklist_url)
+            decklist = fetch_decklist(decklist_url)
             decks.append(
                 {
                     'placing': placement,
@@ -269,7 +267,12 @@ if __name__ == '__main__':
     for tour in tours:
         print(tour)
         decks = get_tour_decklists(tour['url'])
-        for deck in decks:
-            print(deck)
-            break
-        break
+        tour['decklists'] = decks
+        # for deck in decks:
+        #     print(deck)
+        #     break
+        # break
+    import datetime
+    import json
+    with open(f'{datetime.datetime.now()}_city_league_dump.json', 'w') as f:
+        json.dump(tours, f)

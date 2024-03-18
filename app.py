@@ -2,12 +2,10 @@ import dash
 from dash import DiskcacheManager, html, dcc, callback, Output, Input, State
 import dash_bootstrap_components as dbc
 import datetime
-import diskcache
 
 import helpers, deck_table, placements as _place
 
-cache = diskcache.Cache("./cache")
-background_callback_manager = DiskcacheManager(cache)
+background_callback_manager = DiskcacheManager(helpers.disk_cache)
 app = dash.Dash(
     __name__,
     background_callback_manager=background_callback_manager,
