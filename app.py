@@ -33,74 +33,80 @@ placement_slider = 'placement-slider'
 placements = 'placements'
 table_clipboard = 'copy-to-clipboard'
 
-app.layout = dbc.Container([
-    html.H2('City League Result Analysis'),
-    html.P(
-        'Welcome to the Trainer Hill City League decklist analysis tool. '\
-        'This demo tool caches results from Japanese City Leagues via '\
-        'LimitlessTCG. If an event has not yet been cached on the server, '\
-        'the initial fetching may take a few moments.'
-    ),
-    dbc.Row([
-        html.H3('Date Range'),
-        dbc.Col([
-            dcc.DatePickerRange(
-                id=select_dates,
-                start_date=datetime.date.today() - datetime.timedelta(21),
-                end_date=datetime.date.today(),
-                min_date_allowed='2024-01-21'
-            ),
-            dbc.Button('Fetch decks', id=fetch_decks, class_name='mx-1'),
-            dbc.Button('Cancel', id=cancel, color='danger')
-        ], class_name='mb-1'),
-        dbc.Col(dbc.Progress(value=0, id=progress_bar), width=12),
-        dcc.Store(id=decks_store, data=[])
-    ]),
-    dbc.Row([
-        html.H3('Deck filters'),
-        dbc.Col([
-            dbc.Label('Include Cards'),
-            dcc.Dropdown(multi=True, id=include_cards, value=[])
-        ], width=6),
-        dbc.Col([
-            dbc.Label('Exclude Cards'),
-            dcc.Dropdown(multi=True, id=exclude_cards, value=[]),
-        ], width=6),
-        dbc.Col([
-            dbc.Label('Minimum Placement'),
-            dcc.Slider(
-                id=placement_slider,
-                min=1, max=16, step=None, value=16,
-                marks={16: 'T16', 8: 'T8', 4: 'T4', 2: 'Finals', 1: 'Winner'}
-            )
-        ], width=6),
-    ], id=filters),
-    dbc.Row(dbc.Col([
-        dbc.Progress(value=0, id=progress_analysis),
-        html.H3('Analysis'),
-        html.H4([
-            'Total decks:',
-            dbc.Badge(0, id=total_decks, class_name='mx-1'),
+def layout():
+    l = dbc.Container([
+        html.H2('City League Result Analysis'),
+        html.P(
+            'Welcome to the Trainer Hill City League decklist analysis tool. '\
+            'This demo tool caches results from Japanese City Leagues via '\
+            'LimitlessTCG. If an event has not yet been cached on the server, '\
+            'the initial fetching may take a few moments.'
+        ),
+        dbc.Row([
+            html.H3('Date Range'),
+            dbc.Col([
+                dcc.DatePickerRange(
+                    id=select_dates,
+                    start_date=datetime.date.today() - datetime.timedelta(21),
+                    end_date=datetime.date.today(),
+                    min_date_allowed='2024-01-21'
+                ),
+                dbc.Button('Fetch decks', id=fetch_decks, class_name='mx-1'),
+                dbc.Button('Cancel', id=cancel, color='danger')
+            ], class_name='mb-1'),
+            dbc.Col(dbc.Progress(value=0, id=progress_bar), width=12),
+            dcc.Store(id=decks_store, data=[])
         ]),
-        dbc.Label('Showing % of available decks'),
-        dbc.Progress(id=inclusion_rate, value=0, color='danger'),
-        dcc.Graph(id=placements, config={'displayModeBar': False}),
-        dbc.Button(dcc.Clipboard(id=table_clipboard, content='None'), className='me-1', title='Copy Skeleton Decklist'),
-        html.Span(dbc.RadioItems(
-            id=skeleton_type,
-            className='btn-group',
-            inputClassName='btn-check',
-            labelClassName='btn btn-outline-primary',
-            labelCheckedClassName='active',
-            options=[
-                {'label': 'List', 'value': 'list'},
-                {'label': 'Grid', 'value': 'grid'},
-            ],
-            value='grid',
-        ), className='radio-group'),
-        html.Div(id=skeleton)
-    ], width=12), id=analysis)
-], fluid=True)
+        dbc.Row([
+            html.H3('Deck filters'),
+            dbc.Col([
+                dbc.Label('Include Cards'),
+                dcc.Dropdown(multi=True, id=include_cards, value=[])
+            ], width=6),
+            dbc.Col([
+                dbc.Label('Exclude Cards'),
+                dcc.Dropdown(multi=True, id=exclude_cards, value=[]),
+            ], width=6),
+            dbc.Col([
+                dbc.Label('Minimum Placement'),
+                dcc.Slider(
+                    id=placement_slider,
+                    min=1, max=16, step=None, value=16,
+                    marks={16: 'T16', 8: 'T8', 4: 'T4', 2: 'Finals', 1: 'Winner'}
+                )
+            ], width=6),
+        ], id=filters),
+        dbc.Row(dbc.Col([
+            dbc.Progress(value=0, id=progress_analysis),
+            html.H3('Analysis'),
+            html.H4([
+                'Total decks:',
+                dbc.Badge(0, id=total_decks, class_name='mx-1'),
+            ]),
+            dbc.Label('Showing % of available decks'),
+            dbc.Progress(id=inclusion_rate, value=0, color='danger'),
+            dcc.Graph(id=placements, config={'displayModeBar': False}),
+            dbc.Button(dcc.Clipboard(id=table_clipboard, content='None'), className='me-1', title='Copy Skeleton Decklist'),
+            html.Span(dbc.RadioItems(
+                id=skeleton_type,
+                className='btn-group',
+                inputClassName='btn-check',
+                labelClassName='btn btn-outline-primary',
+                labelCheckedClassName='active',
+                options=[
+                    {'label': 'List', 'value': 'list'},
+                    {'label': 'Grid', 'value': 'grid'},
+                ],
+                value='grid',
+            ), className='radio-group'),
+            html.Div(id=skeleton)
+        ], width=12), id=analysis)
+    ], fluid=True)
+    return l
+
+
+app.layout = layout
+
 
 @callback(
     Output(decks_store, 'data'),
